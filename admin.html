@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>InvestPro - Administration</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+        
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            background: #f8fafc; 
+            color: #1e293b;
+        }
+
+        .admin-card {
+            background: white;
+            border-radius: 24px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+
+        .input-group input, .input-group select, .input-group textarea {
+            transition: all 0.2s;
+            border: 1px solid #e2e8f0;
+        }
+
+        .input-group input:focus, .input-group select:focus, .input-group textarea:focus {
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+            background: white;
+        }
+
+        .btn-primary {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.3);
+        }
+
+        /* Spinner personnalisé pour le loader */
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #4f46e5;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body class="p-4 md:p-8 lg:p-12">
+
+    <div id="loader" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[200] hidden flex flex-col items-center justify-center text-white">
+        <div class="spinner mb-4"></div>
+        <p class="font-bold tracking-widest text-sm animate-pulse">SYNCHRONISATION GITHUB...</p>
+    </div>
+
+    <div class="max-w-7xl mx-auto">
+        <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4">
+            <div class="animate__animated animate__fadeInLeft">
+                <div class="flex items-center gap-2 mb-1">
+                    <span class="bg-indigo-600 text-white text-[10px] font-black px-2 py-0.5 rounded uppercase tracking-tighter">Panel</span>
+                    <h1 class="text-3xl font-extrabold tracking-tight text-slate-900">ESPACE GESTION</h1>
+                </div>
+                <p class="text-indigo-600 text-xs font-bold uppercase tracking-[0.2em] flex items-center gap-2">
+                    <span class="w-2 h-2 bg-indigo-600 rounded-full animate-ping"></span>
+                    Administrateur Connecté
+                </p>
+            </div>
+            <button onclick="window.location.href='index.html'" class="group flex items-center gap-2 px-6 py-3 bg-white border border-slate-200 rounded-2xl font-bold text-slate-600 hover:bg-slate-50 transition-all shadow-sm">
+                <i class="fas fa-arrow-left group-hover:-translate-x-1 transition"></i>
+                Quitter l'admin
+            </button>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            
+            <div class="lg:col-span-4 space-y-6 animate__animated animate__fadeInUp">
+                <div class="admin-card p-6 md:p-8">
+                    <h3 class="font-extrabold text-lg mb-6 flex items-center gap-3">
+                        <div class="w-10 h-10 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center text-sm">
+                            <i class="fas fa-file-signature"></i>
+                        </div>
+                        ÉDITION DES STATUTS
+                    </h3>
+                    <div class="input-group">
+                        <textarea id="status-field" 
+                            placeholder="Rédigez les statuts ici..."
+                            class="w-full h-[450px] p-5 bg-slate-50 border rounded-2xl outline-none mb-6 text-sm leading-relaxed resize-none font-medium text-slate-600"></textarea>
+                    </div>
+                    <button onclick="saveStatus()" class="btn-primary w-full py-4 bg-slate-900 text-white rounded-2xl font-bold text-sm tracking-wide flex items-center justify-center gap-2">
+                        <i class="fas fa-save opacity-50"></i> SAUVEGARDER LES MODIFICATIONS
+                    </button>
+                </div>
+            </div>
+
+            <div class="lg:col-span-8 space-y-8 animate__animated animate__fadeInUp" style="animation-delay: 0.1s">
+                
+                <div class="admin-card p-6 md:p-8">
+                    <h3 class="font-extrabold text-lg mb-6 flex items-center gap-3">
+                        <div class="w-10 h-10 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center text-sm">
+                            <i class="fas fa-user-plus"></i>
+                        </div>
+                        NOUVEAU MEMBRE
+                    </h3>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-8 input-group">
+                        <div>
+                            <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 mb-1.5 block">Identité</label>
+                            <div class="space-y-3">
+                                <input type="text" id="m-nom" placeholder="Nom de famille" class="w-full p-3.5 bg-slate-50 rounded-xl outline-none font-semibold">
+                                <input type="text" id="m-prenom" placeholder="Prénom" class="w-full p-3.5 bg-slate-50 rounded-xl outline-none font-semibold">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 mb-1.5 block">Coordonnées</label>
+                            <div class="space-y-3">
+                                <input type="number" id="m-age" placeholder="Âge" class="w-full p-3.5 bg-slate-50 rounded-xl outline-none font-semibold">
+                                <input type="text" id="m-tel" placeholder="N° Téléphone" class="w-full p-3.5 bg-slate-50 rounded-xl outline-none font-semibold">
+                            </div>
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 mb-1.5 block">Informations Complémentaires</label>
+                            <input type="text" id="m-adr" placeholder="Adresse complète" class="w-full p-3.5 bg-slate-50 rounded-xl outline-none font-semibold mb-3">
+                            <input type="text" id="m-spec" placeholder="Spécialité ou Poste" class="w-full p-3.5 bg-slate-50 rounded-xl outline-none font-semibold">
+                        </div>
+                        <div class="md:col-span-2 p-4 border-2 border-dashed border-slate-100 rounded-2xl bg-slate-50/50">
+                            <label class="text-[10px] font-black text-slate-400 block mb-2 uppercase tracking-widest">Photo de Profil (Format Image)</label>
+                            <input type="file" id="m-photo" class="text-xs file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 cursor-pointer w-full">
+                        </div>
+                    </div>
+                    
+                    <button onclick="addMember()" class="btn-primary w-full py-4 bg-indigo-600 text-white rounded-2xl font-black shadow-lg shadow-indigo-100 flex items-center justify-center gap-2 uppercase text-sm tracking-wider">
+                        <i class="fas fa-plus-circle opacity-50"></i> Enregistrer le nouveau membre
+                    </button>
+                </div>
+
+                <div class="bg-indigo-900 p-6 md:p-8 rounded-[2rem] shadow-2xl text-white relative overflow-hidden">
+                    <div class="absolute -right-10 -bottom-10 opacity-10">
+                        <i class="fas fa-hand-holding-dollar text-[12rem]"></i>
+                    </div>
+
+                    <h3 class="font-extrabold text-lg mb-6 flex items-center gap-3 relative z-10">
+                        <div class="w-10 h-10 bg-white/10 text-indigo-200 rounded-xl flex items-center justify-center text-sm">
+                            <i class="fas fa-coins"></i>
+                        </div>
+                        ENREGISTRER UNE COTISATION
+                    </h3>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5 relative z-10">
+                        <div class="space-y-4">
+                            <div>
+                                <label class="text-[10px] font-bold text-indigo-300 uppercase tracking-widest ml-1 mb-1.5 block">Sélectionner le membre</label>
+                                <select id="pay-mid" class="w-full p-3.5 bg-white/10 border border-white/20 rounded-xl text-white outline-none font-semibold focus:bg-white focus:text-slate-900 transition-colors"></select>
+                            </div>
+                            <div>
+                                <label class="text-[10px] font-bold text-indigo-300 uppercase tracking-widest ml-1 mb-1.5 block">Montant du versement (Ar)</label>
+                                <input type="number" id="pay-amt" placeholder="Ex: 50000" class="w-full p-3.5 bg-white/10 border border-white/20 rounded-xl text-white outline-none font-semibold focus:bg-white focus:text-slate-900 transition-colors placeholder:text-indigo-200/50">
+                            </div>
+                        </div>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="text-[10px] font-bold text-indigo-300 uppercase tracking-widest ml-1 mb-1.5 block">Date de réception</label>
+                                <input type="date" id="pay-date" class="w-full p-3.5 bg-white/10 border border-white/20 rounded-xl text-white outline-none font-semibold focus:bg-white focus:text-slate-900 transition-colors">
+                            </div>
+                            <div>
+                                <label class="text-[10px] font-bold text-indigo-300 uppercase tracking-widest ml-1 mb-1.5 block">Preuve de paiement (Scan/Photo)</label>
+                                <input type="file" id="pay-fact" class="w-full text-xs file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-white/10 file:text-white hover:file:bg-white/20 cursor-pointer pt-2">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button onclick="addPay()" class="btn-primary w-full mt-8 py-4 bg-emerald-500 text-white rounded-2xl font-black shadow-xl shadow-emerald-900/20 uppercase text-sm tracking-widest flex items-center justify-center gap-2">
+                        <i class="fas fa-check-double"></i> Valider et synchroniser le paiement
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Logique de sécurité et config (Inchangée)
+        if(sessionStorage.getItem('isAdmin') !== 'true') window.location.href = "index.html";
+        const config = { token: "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", repo: "fetrasoatanjonait/invest" };
+        let db = { membres: [], status: "", cotisations: [] };
+        let shas = { status: "", membres: "", cotisation: "" };
+
+        window.onload = async () => {
+            document.getElementById('loader').classList.remove('hidden');
+            await Promise.all([sync('membres'), sync('status'), sync('cotisation')]);
+            document.getElementById('status-field').value = db.status;
+            renderSelect();
+            document.getElementById('loader').classList.add('hidden');
+        };
+
+        async function sync(file) {
+            try {
+                const res = await fetch(`https://api.github.com/repos/${config.repo}/contents/${file}.json`, {
+                    headers: { Authorization: `token ${config.token}` }
+                });
+                if(res.ok) {
+                    const data = await res.json();
+                    shas[file] = data.sha;
+                    db[file === 'cotisation' ? 'cotisations' : file] = JSON.parse(decodeURIComponent(escape(atob(data.content))));
+                }
+            } catch(e) { console.error(e); }
+        }
+
+        async function push(file, content) {
+            document.getElementById('loader').classList.remove('hidden');
+            const res = await fetch(`https://api.github.com/repos/${config.repo}/contents/${file}.json`, {
+                method: 'PUT',
+                headers: { Authorization: `token ${config.token}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    message: `Update ${file}`,
+                    content: btoa(unescape(encodeURIComponent(JSON.stringify(content)))),
+                    sha: shas[file]
+                })
+            });
+            if(res.ok) {
+                const data = await res.json();
+                shas[file] = data.content.sha;
+                alert(`Données mises à jour sur GitHub !`);
+            }
+            document.getElementById('loader').classList.add('hidden');
+        }
+
+        async function addMember() {
+            const photoFile = document.getElementById('m-photo').files[0];
+            const m = {
+                id: Date.now(),
+                nom: document.getElementById('m-nom').value,
+                prenom: document.getElementById('m-prenom').value,
+                age: document.getElementById('m-age').value,
+                tel: document.getElementById('m-tel').value,
+                adr: document.getElementById('m-adr').value,
+                spec: document.getElementById('m-spec').value,
+                photo: photoFile ? await toB64(photoFile) : null
+            };
+            
+            if(!m.nom || !m.prenom) return alert("Nom et Prénom requis");
+            
+            db.membres.push(m);
+            await push('membres', db.membres);
+            renderSelect();
+            // Reset form
+            document.querySelectorAll('.input-group input').forEach(i => i.value = "");
+        }
+
+        async function addPay() {
+            const file = document.getElementById('pay-fact').files[0];
+            const p = {
+                mid: document.getElementById('pay-mid').value,
+                amount: document.getElementById('pay-amt').value,
+                date: document.getElementById('pay-date').value,
+                img: file ? await toB64(file) : null
+            };
+            
+            if(!p.amount || !p.date) return alert("Montant et Date requis");
+            
+            db.cotisations.push(p);
+            await push('cotisation', db.cotisations);
+            document.getElementById('pay-amt').value = "";
+        }
+
+        async function saveStatus() {
+            db.status = document.getElementById('status-field').value;
+            await push('status', db.status);
+        }
+
+        function renderSelect() {
+            document.getElementById('pay-mid').innerHTML = db.membres.map(m => `<option value="${m.id}">${m.nom} ${m.prenom}</option>`).join('');
+        }
+
+        const toB64 = f => new Promise(res => { const r = new FileReader(); r.onload = () => res(r.result); r.readAsDataURL(f); });
+    </script>
+</body>
+</html>

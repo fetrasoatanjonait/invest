@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>InvestPro - Espace Privé</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+        
+        :root {
+            --primary: #4f46e5; /* Indigo 600 */
+            --primary-light: #818cf8; /* Indigo 400 */
+            --primary-soft: #eef2ff; /* Indigo 50 */
+        }
+
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            background-color: #f8fafc; /* Slate 50 */
+            min-height: 100vh;
+        }
+
+        /* Barre latérale (Sidebar) */
+        .sidebar {
+            width: 260px;
+            background: white;
+            border-right: 1px solid #e2e8f0; /* Slate 200 */
+            display: flex;
+            flex-direction: column;
+            padding: 2rem 1.5rem;
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            z-index: 40;
+        }
+
+        /* Contenu principal (avec décalage pour la sidebar) */
+        .main-content {
+            margin-left: 260px;
+            padding: 2rem 3rem;
+        }
+
+        /* Style des liens du menu */
+        .nav-link {
+            display: flex;
+            items-center: center;
+            gap: 1rem;
+            padding: 0.85rem 1rem;
+            border-radius: 0.75rem; /* 12px */
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: #64748b; /* Slate 500 */
+            transition: all 0.2s ease-in-out;
+            cursor: pointer;
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-link:hover {
+            background-color: #f1f5f9; /* Slate 100 */
+            color: #1e293b; /* Slate 800 */
+        }
+
+        /* Style du lien actif (violet) */
+        .nav-link.active {
+            background-color: var(--primary);
+            color: white;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+        }
+
+        .nav-link.active i {
+            color: var(--primary-light);
+        }
+
+        /* Icônes dans le menu */
+        .nav-link i {
+            font-size: 1.1rem;
+            width: 20px;
+            text-align: center;
+            transition: color 0.2s;
+        }
+
+        /* Cartes d'information (Stats) */
+        .stat-card {
+            background: white;
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            border: 1px solid #e2e8f0;
+            display: flex;
+            items-center: center;
+            gap: 1.25rem;
+            transition: transform 0.2s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 1rem;
+            display: flex;
+            items-center: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+
+        /* Responsive : masquer la sidebar sur mobile */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+            .sidebar.open {
+                transform: translateX(0);
+            }
+            .main-content {
+                margin-left: 0;
+                padding: 1.5rem;
+            }
+            .mobile-header {
+                display: flex !important;
+            }
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+    </style>
+</head>
+<body class="text-slate-800">
+
+    <header class="mobile-header hidden fixed top-0 left-0 right-0 h-16 bg-white border-b border-slate-200 z-50 items-center justify-between px-4">
+        <div class="flex items-center gap-2 font-extrabold text-xl tracking-tight text-indigo-600">
+            <div class="bg-indigo-600 text-white p-1.5 rounded-lg text-sm">
+                <i class="fas fa-chart-pie"></i>
+            </div>
+            <span>INVEST<span class="text-slate-900">PRO</span></span>
+        </div>
+        <button onclick="toggleSidebar()" class="text-slate-600 text-xl p-2"><i class="fas fa-bars"></i></button>
+    </header>
+
+    <aside class="sidebar" id="sidebar">
+        <div class="flex items-center gap-3 font-extrabold text-2xl tracking-tight text-indigo-600 mb-10">
+            <div class="bg-indigo-600 text-white p-2 rounded-xl">
+                <i class="fas fa-chart-pie"></i>
+            </div>
+            <span>INVEST<span class="text-slate-900">PRO</span></span>
+        </div>
+
+        <p class="text-xs font-bold uppercase text-slate-400 tracking-widest mb-4 px-3">Menu Principal</p>
+
+        <nav class="flex-grow">
+            <a onclick="tab('membres'); toggleSidebar(false)" id="b-membres" class="nav-link active">
+                <i class="fas fa-users"></i>
+                <span>Membres</span>
+            </a>
+            <a onclick="tab('statuts'); toggleSidebar(false)" id="b-statuts" class="nav-link">
+                <i class="fas fa-file-contract"></i>
+                <span>Statuts</span>
+            </a>
+            <a onclick="tab('history'); toggleSidebar(false)" id="b-history" class="nav-link">
+                <i class="fas fa-history"></i>
+                <span>Historique</span>
+            </a>
+        </nav>
+
+        <div class="border-t border-slate-100 pt-6 mt-6">
+            <button onclick="loginRedirect()" class="group flex w-full items-center justify-center gap-2.5 px-5 py-3 bg-slate-900 text-white rounded-xl font-semibold text-sm hover:bg-indigo-600 transition-all shadow-lg shadow-slate-200">
+                <i class="fas fa-shield-halved text-indigo-400 group-hover:text-white transition"></i>
+                Administration
+            </button>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        
+        <div class="flex items-center justify-between mb-8 pb-4 border-b border-slate-100 mt-4 md:mt-0">
+            <h1 id="page-title" class="text-3xl font-extrabold text-slate-950 tracking-tight">Annuaire des Membres</h1>
+            <p class="text-sm text-slate-500 font-medium">Espace Privé</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+            <div class="stat-card">
+                <div class="stat-icon bg-indigo-50 text-indigo-600">
+                    <i class="fas fa-vault"></i>
+                </div>
+                <div>
+                    <p class="text-xs font-bold uppercase text-slate-400 tracking-wider mb-0.5">Total Collecté</p>
+                    <h2 id="total-cash" class="text-2xl font-extrabold text-slate-950">Chargement...</h2>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon bg-emerald-50 text-emerald-600">
+                    <i class="fas fa-calendar-check"></i>
+                </div>
+                <div>
+                    <p class="text-xs font-bold uppercase text-slate-400 tracking-wider mb-0.5">Dernier versement</p>
+                    <h2 id="last-pay" class="text-xl font-bold text-slate-700 italic">--/--/--</h2>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon bg-amber-50 text-amber-600">
+                    <i class="fas fa-user-friends"></i>
+                </div>
+                <div>
+                    <p class="text-xs font-bold uppercase text-slate-400 tracking-wider mb-0.5">Membres Actifs</p>
+                    <h2 id="member-count" class="text-2xl font-extrabold text-slate-950">0</h2>
+                </div>
+            </div>
+        </div>
+
+        <section id="p-membres" class="page-view animate__animated animate__fadeIn animate__faster">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" id="list-membres"></div>
+        </section>
+
+        <section id="p-statuts" class="page-view hidden animate__animated animate__fadeIn animate__faster">
+            <div class="bg-white p-8 md:p-10 rounded-2xl border border-slate-200 shadow-sm relative overflow-hidden">
+                <div class="absolute -top-6 -right-6 p-10 opacity-[0.03] pointer-events-none">
+                    <i class="fas fa-file-signature text-[12rem] text-slate-900"></i>
+                </div>
+                <div id="statuts-content" class="relative z-10 italic leading-relaxed text-lg text-slate-600 whitespace-pre-wrap font-medium"></div>
+            </div>
+        </section>
+
+        <section id="p-history" class="page-view hidden animate__animated animate__fadeIn animate__faster">
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-slate-50 border-b border-slate-100">
+                                <th class="px-6 py-4 text-[11px] font-black uppercase text-slate-400 tracking-widest">Membre</th>
+                                <th class="px-6 py-4 text-[11px] font-black uppercase text-slate-400 tracking-widest">Date</th>
+                                <th class="px-6 py-4 text-[11px] font-black uppercase text-slate-400 tracking-widest">Montant</th>
+                                <th class="px-6 py-4 text-[11px] font-black uppercase text-slate-400 tracking-widest text-right">Preuve</th>
+                            </tr>
+                        </thead>
+                        <tbody id="list-pay" class="divide-y divide-slate-100"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div id="sidebar-overlay" onclick="toggleSidebar(false)" class="fixed inset-0 bg-slate-900/50 z-30 hidden transition-opacity duration-300 opacity-0"></div>
+
+    <div id="zoom" onclick="this.classList.add('hidden')" class="fixed inset-0 bg-slate-900/95 z-[100] hidden flex items-center justify-center p-6 backdrop-blur-sm">
+        <div class="relative animate__animated animate__zoomIn animate__faster">
+            <button class="absolute -top-10 right-0 text-white text-3xl"><i class="fas fa-times"></i></button>
+            <img id="z-img" src="" class="max-w-full max-h-[88vh] rounded-xl shadow-2xl border-2 border-white/10">
+        </div>
+    </div>
+
+    <script>
+        const config = { token: "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", repo: "fetrasoatanjonait/invest" };
+        let db = { membres: [], status: "", cotisations: [] };
+
+        window.onload = async () => {
+            await Promise.all([sync('membres'), sync('status'), sync('cotisation')]);
+            render();
+        };
+
+        async function sync(file) {
+            try {
+                const res = await fetch(`https://api.github.com/repos/${config.repo}/contents/${file}.json`, {
+                    headers: { Authorization: `token ${config.token}` }
+                });
+                if(res.ok) {
+                    const data = await res.json();
+                    db[file === 'cotisation' ? 'cotisations' : file] = JSON.parse(decodeURIComponent(escape(atob(data.content))));
+                }
+            } catch (e) { console.error("Erreur de synchro", e); }
+        }
+
+        function render() {
+            const total = db.cotisations.reduce((acc, c) => acc + parseFloat(c.amount), 0);
+            document.getElementById('total-cash').innerText = total.toLocaleString() + " Ar";
+            document.getElementById('member-count').innerText = db.membres.length;
+            document.getElementById('last-pay').innerText = db.cotisations.length > 0 ? db.cotisations[db.cotisations.length-1].date : "--/--/--";
+            
+            document.getElementById('statuts-content').innerText = db.status;
+
+            document.getElementById('list-membres').innerHTML = db.membres.map(m => `
+                <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm text-center group transition-all hover:shadow-md hover:border-slate-200">
+                    <div class="relative w-24 h-24 mx-auto mb-5">
+                        <img src="${m.photo || 'https://via.placeholder.com/150'}" onclick="zoom('${m.photo}')" 
+                             class="w-full h-full rounded-full object-cover cursor-zoom-in border-4 border-slate-50 shadow-inner transition-transform group-hover:scale-105">
+                        <div class="absolute bottom-1 right-1 w-5 h-5 bg-emerald-500 border-4 border-white rounded-full"></div>
+                    </div>
+                    <h4 class="font-extrabold text-lg text-slate-950">${m.nom} ${m.prenom}</h4>
+                    <p class="text-[11px] font-black text-indigo-600 uppercase mt-1 mb-4 tracking-wider">${m.spec}</p>
+                    
+                    <div class="pt-4 border-t border-slate-100 space-y-2 text-sm text-slate-600">
+                        <div class="flex items-center justify-center gap-2">
+                            <i class="fas fa-phone text-indigo-300 text-xs w-4"></i>
+                            <span>${m.tel}</span>
+                        </div>
+                        <div class="flex items-center justify-center gap-2">
+                            <i class="fas fa-map-marker-alt text-indigo-300 text-xs w-4"></i>
+                            <span class="truncate">${m.adr}</span>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            document.getElementById('list-pay').innerHTML = db.cotisations.map(p => {
+                const m = db.membres.find(x => x.id == p.mid);
+                return `
+                <tr class="hover:bg-slate-50 transition-colors">
+                    <td class="px-6 py-4">
+                        <div class="font-bold text-slate-900">${m ? m.nom + ' ' + m.prenom : 'Membre inconnu'}</div>
+                    </td>
+                    <td class="px-6 py-4 text-slate-500 font-medium text-sm">
+                        ${p.date}
+                    </td>
+                    <td class="px-6 py-4">
+                        <span class="font-extrabold text-emerald-600 text-sm">
+                            + ${parseFloat(p.amount).toLocaleString()} Ar
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 text-right">
+                        ${p.img ? `
+                            <button onclick="zoom('${p.img}')" class="inline-flex items-center gap-1.5 text-indigo-600 font-bold text-xs uppercase tracking-wider hover:text-indigo-800">
+                                <i class="fas fa-receipt"></i> Voir
+                            </button>` : '<span class="text-slate-300">---</span>'}
+                    </td>
+                </tr>`;
+            }).join('');
+        }
+
+        // Mapping des titres de page
+        const titles = { 'membres': 'Annuaire des Membres', 'statuts': 'Statuts de l\'Association', 'history': 'Historique des Versements' };
+
+        function tab(id) {
+            // Update Title
+            document.getElementById('page-title').innerText = titles[id];
+
+            // Update Buttons (Sidebar)
+            document.querySelectorAll('.nav-link').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('b-' + id).classList.add('active');
+
+            // Update Sections
+            document.querySelectorAll('.page-view').forEach(p => p.classList.add('hidden'));
+            document.getElementById('p-'+id).classList.remove('hidden');
+        }
+
+        function zoom(s) { if(s) { document.getElementById('z-img').src=s; document.getElementById('zoom').classList.remove('hidden'); } }
+
+        function loginRedirect() {
+            const user = prompt("Identifiant :");
+            const pass = prompt("Mot de passe :");
+            if(user === "admin" && pass === "investpro") {
+                sessionStorage.setItem('isAdmin', 'true');
+                window.location.href = "admin.html";
+            } else if(user !== null) { alert("Accès refusé"); }
+        }
+
+        // Fonctions pour le menu mobile
+        function toggleSidebar(open) {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            if (open === undefined) open = !sidebar.classList.contains('open');
+            
+            if (open) {
+                sidebar.classList.add('open');
+                overlay.classList.remove('hidden');
+                setTimeout(() => { overlay.classList.add('opacity-100'); overlay.classList.remove('opacity-0'); }, 10);
+            } else {
+                sidebar.classList.remove('open');
+                overlay.classList.add('opacity-0');
+                overlay.classList.remove('opacity-100');
+                setTimeout(() => overlay.classList.add('hidden'), 300);
+            }
+        }
+    </script>
+</body>
+</html>

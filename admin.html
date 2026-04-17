@@ -3,167 +3,131 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>InvestPro - Administration</title>
+    <title>InvestPro - Administration Master</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
-        
-        body { 
-            font-family: 'Plus Jakarta Sans', sans-serif; 
-            background: #f8fafc; 
-            color: #1e293b;
-        }
-
-        .admin-card {
-            background: white;
-            border-radius: 24px;
-            border: 1px solid #e2e8f0;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-        }
-
-        .input-group input, .input-group select, .input-group textarea {
-            transition: all 0.2s;
-            border: 1px solid #e2e8f0;
-        }
-
-        .input-group input:focus, .input-group select:focus, .input-group textarea:focus {
-            border-color: #4f46e5;
-            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
-            background: white;
-        }
-
-        .btn-primary {
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.3);
-        }
-
-        .spinner {
-            width: 40px;
-            height: 40px;
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #4f46e5;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f8fafc; color: #1e293b; }
+        .admin-card { background: white; border-radius: 24px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); }
+        .btn-primary { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.3); }
+        .spinner { width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid #4f46e5; border-radius: 50%; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        #edit-modal { backdrop-filter: blur(8px); z-index: 300; }
     </style>
 </head>
 <body class="p-4 md:p-8 lg:p-12">
 
-    <div id="loader" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[200] hidden flex flex-col items-center justify-center text-white">
+    <div id="loader" class="fixed inset-0 bg-slate-900/60 z-[400] hidden flex flex-col items-center justify-center text-white">
         <div class="spinner mb-4"></div>
-        <p class="font-bold tracking-widest text-sm animate-pulse">SYNCHRONISATION GITHUB...</p>
+        <p class="font-bold tracking-widest text-sm animate-pulse uppercase">Traitement en cours...</p>
+    </div>
+
+    <div id="edit-modal" class="fixed inset-0 hidden flex items-center justify-center p-4 bg-slate-900/40">
+        <div class="bg-white w-full max-w-2xl rounded-[2.5rem] p-8 shadow-2xl animate__animated animate__zoomIn">
+            <div class="flex justify-between items-center mb-8">
+                <h3 class="text-2xl font-black text-slate-800 uppercase tracking-tight">Modifier le profil</h3>
+                <button onclick="closeModal()" class="text-slate-300 hover:text-red-500 transition"><i class="fas fa-times-circle text-3xl"></i></button>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <input type="hidden" id="edit-id">
+                <div class="space-y-4">
+                    <input type="text" id="edit-nom" placeholder="Nom" class="w-full p-4 bg-slate-50 border rounded-2xl font-bold">
+                    <input type="text" id="edit-prenom" placeholder="Prénom" class="w-full p-4 bg-slate-50 border rounded-2xl font-bold">
+                    <input type="number" id="edit-age" placeholder="Âge" class="w-full p-4 bg-slate-50 border rounded-2xl font-bold">
+                </div>
+                <div class="space-y-4">
+                    <input type="text" id="edit-tel" placeholder="Téléphone" class="w-full p-4 bg-slate-50 border rounded-2xl font-bold">
+                    <input type="text" id="edit-spec" placeholder="Poste / Spécialité" class="w-full p-4 bg-slate-50 border rounded-2xl font-bold">
+                    <select id="edit-status" class="w-full p-4 bg-slate-100 border rounded-2xl font-black text-indigo-600">
+                        <option value="Actif">Membre Actif ✅</option>
+                        <option value="En attente">En attente ⏳</option>
+                        <option value="Suspendu">Suspendu ❌</option>
+                    </select>
+                </div>
+                <input type="text" id="edit-adr" placeholder="Adresse complète" class="md:col-span-2 w-full p-4 bg-slate-50 border rounded-2xl font-bold">
+            </div>
+            <button onclick="updateMember()" class="w-full py-5 bg-slate-900 text-white rounded-2xl font-black shadow-xl mt-8 uppercase tracking-widest hover:bg-indigo-600 transition">
+                Mettre à jour les données
+            </button>
+        </div>
     </div>
 
     <div class="max-w-7xl mx-auto">
-        <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4">
-            <div class="animate__animated animate__fadeInLeft">
-                <div class="flex items-center gap-2 mb-1">
-                    <span class="bg-indigo-600 text-white text-[10px] font-black px-2 py-0.5 rounded uppercase tracking-tighter">Panel</span>
-                    <h1 class="text-3xl font-extrabold tracking-tight text-slate-900">ESPACE GESTION</h1>
-                </div>
-                <p class="text-indigo-600 text-xs font-bold uppercase tracking-[0.2em] flex items-center gap-2">
-                    <span class="w-2 h-2 bg-indigo-600 rounded-full animate-ping"></span>
-                    Administrateur Connecté
+        <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-12 gap-6">
+            <div>
+                <h1 class="text-4xl font-black text-slate-900 tracking-tighter">SYSTÈME ADMIN</h1>
+                <p class="text-indigo-600 font-bold uppercase text-xs tracking-[0.3em] flex items-center gap-2 mt-2">
+                    <span class="w-2 h-2 bg-indigo-600 rounded-full animate-ping"></span> Synchronisé avec GitHub
                 </p>
             </div>
-            <button onclick="window.location.href='index.html'" class="group flex items-center gap-2 px-6 py-3 bg-white border border-slate-200 rounded-2xl font-bold text-slate-600 hover:bg-slate-50 transition-all shadow-sm">
-                <i class="fas fa-arrow-left group-hover:-translate-x-1 transition"></i>
-                Quitter l'admin
+            <button onclick="window.location.href='index.html'" class="px-8 py-4 bg-white border border-slate-200 rounded-2xl font-black text-slate-500 hover:bg-slate-50 transition shadow-sm">
+                RETOUR AU SITE
             </button>
         </header>
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
             
-            <div class="lg:col-span-4 space-y-6 animate__animated animate__fadeInUp">
-                <div class="admin-card p-6 md:p-8">
-                    <h3 class="font-extrabold text-lg mb-6 flex items-center gap-3">
-                        <div class="w-10 h-10 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center text-sm">
-                            <i class="fas fa-file-signature"></i>
-                        </div>
-                        ÉDITION DES STATUTS
+            <div class="lg:col-span-4 space-y-6">
+                <div class="admin-card p-8">
+                    <h3 class="font-black text-sm mb-6 uppercase text-slate-400 tracking-widest flex items-center gap-2">
+                        <i class="fas fa-file-alt text-indigo-500"></i> Statuts de l'Association
                     </h3>
-                    <div class="input-group">
-                        <textarea id="status-field" 
-                            placeholder="Rédigez les statuts ici..."
-                            class="w-full h-[450px] p-5 bg-slate-50 border rounded-2xl outline-none mb-6 text-sm leading-relaxed resize-none font-medium text-slate-600"></textarea>
-                    </div>
-                    <button onclick="saveStatus()" class="btn-primary w-full py-4 bg-slate-900 text-white rounded-2xl font-bold text-sm tracking-wide flex items-center justify-center gap-2">
-                        <i class="fas fa-save opacity-50"></i> SAUVEGARDER LES MODIFICATIONS
+                    <textarea id="status-field" class="w-full h-[500px] p-6 bg-slate-50 border-none rounded-[1.5rem] outline-none text-sm font-medium text-slate-600 leading-relaxed resize-none shadow-inner"></textarea>
+                    <button onclick="saveStatus()" class="btn-primary w-full mt-6 py-4 bg-indigo-600 text-white rounded-2xl font-black shadow-lg uppercase text-xs tracking-widest">
+                        Enregistrer Statuts
                     </button>
                 </div>
             </div>
 
-            <div class="lg:col-span-8 space-y-8 animate__animated animate__fadeInUp" style="animation-delay: 0.1s">
+            <div class="lg:col-span-8 space-y-8">
                 
-                <div class="admin-card p-6 md:p-8">
-                    <h3 class="font-extrabold text-lg mb-6 flex items-center gap-3">
-                        <div class="w-10 h-10 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center text-sm"><i class="fas fa-user-plus"></i></div>
-                        NOUVEAU MEMBRE
-                    </h3>
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-8 input-group">
-                        <div>
-                            <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 mb-1.5 block">Identité</label>
-                            <div class="space-y-3">
-                                <input type="text" id="m-nom" placeholder="Nom" class="w-full p-3.5 bg-slate-50 rounded-xl outline-none font-semibold">
-                                <input type="text" id="m-prenom" placeholder="Prénom" class="w-full p-3.5 bg-slate-50 rounded-xl outline-none font-semibold">
-                            </div>
-                        </div>
-                        <div>
-                            <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 mb-1.5 block">Coordonnées</label>
-                            <div class="space-y-3">
-                                <input type="number" id="m-age" placeholder="Âge" class="w-full p-3.5 bg-slate-50 rounded-xl outline-none font-semibold">
-                                <input type="text" id="m-tel" placeholder="Téléphone" class="w-full p-3.5 bg-slate-50 rounded-xl outline-none font-semibold">
-                            </div>
-                        </div>
-                        <div class="md:col-span-2">
-                            <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 mb-1.5 block">Informations Complémentaires</label>
-                            <input type="text" id="m-adr" placeholder="Adresse" class="w-full p-3.5 bg-slate-50 rounded-xl outline-none font-semibold mb-3">
-                            <input type="text" id="m-spec" placeholder="Poste" class="w-full p-3.5 bg-slate-50 rounded-xl outline-none font-semibold">
-                        </div>
-                        <div class="md:col-span-2 p-4 border-2 border-dashed border-slate-100 rounded-2xl bg-slate-50/50">
-                            <label class="text-[10px] font-black text-slate-400 block mb-2 uppercase">Photo de Profil</label>
-                            <input type="file" id="m-photo" class="text-xs w-full">
+                <div class="admin-card p-8">
+                    <h3 class="font-black text-sm mb-6 uppercase text-slate-400 tracking-widest">Nouveau Membre</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                        <input type="text" id="m-nom" placeholder="Nom" class="p-4 bg-slate-50 border rounded-2xl font-bold">
+                        <input type="text" id="m-prenom" placeholder="Prénom" class="p-4 bg-slate-50 border rounded-2xl font-bold">
+                        <input type="number" id="m-age" placeholder="Âge" class="p-4 bg-slate-50 border rounded-2xl font-bold">
+                        <input type="text" id="m-tel" placeholder="Téléphone" class="p-4 bg-slate-50 border rounded-2xl font-bold">
+                        <input type="text" id="m-adr" placeholder="Adresse" class="p-4 bg-slate-50 border rounded-2xl font-bold md:col-span-2">
+                        <input type="text" id="m-spec" placeholder="Poste / Rôle" class="p-4 bg-slate-50 border rounded-2xl font-bold md:col-span-2">
+                        <div class="md:col-span-2 p-6 border-2 border-dashed border-slate-200 rounded-2xl bg-slate-50 flex items-center justify-between">
+                            <span class="text-xs font-bold text-slate-400">Photo de profil</span>
+                            <input type="file" id="m-photo" class="text-xs font-bold text-indigo-600">
                         </div>
                     </div>
-                    
-                    <button onclick="addMember()" class="btn-primary w-full py-4 bg-indigo-600 text-white rounded-2xl font-black shadow-lg uppercase text-sm mb-6">
-                        <i class="fas fa-plus-circle mr-2"></i>Enregistrer le membre
+                    <button onclick="addMember()" class="btn-primary w-full py-5 bg-indigo-600 text-white rounded-2xl font-black shadow-lg uppercase text-sm">
+                        Ajouter au Registre
                     </button>
 
-                    <div id="members-list" class="space-y-2 border-t pt-6"></div>
+                    <div id="members-list" class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-10 pt-10 border-t border-slate-100">
+                        </div>
                 </div>
 
-                <div class="bg-indigo-900 p-6 md:p-8 rounded-[2rem] shadow-2xl text-white relative overflow-hidden">
-                    <h3 class="font-extrabold text-lg mb-6 flex items-center gap-3 relative z-10">
-                        <div class="w-10 h-10 bg-white/10 text-indigo-200 rounded-xl flex items-center justify-center text-sm"><i class="fas fa-coins"></i></div>
-                        ENREGISTRER UNE COTISATION
-                    </h3>
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5 relative z-10">
+                <div class="bg-slate-900 p-8 md:p-10 rounded-[3rem] shadow-2xl text-white">
+                    <h3 class="font-black text-sm mb-8 uppercase text-indigo-400 tracking-widest">Gestion des Flux / Cotisations</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
                         <div class="space-y-4">
-                            <select id="pay-mid" class="w-full p-3.5 bg-white/10 border border-white/20 rounded-xl text-white outline-none font-semibold focus:bg-white focus:text-slate-900 transition-colors"></select>
-                            <input type="number" id="pay-amt" placeholder="Montant (Ar)" class="w-full p-3.5 bg-white/10 border border-white/20 rounded-xl text-white outline-none font-semibold focus:bg-white focus:text-slate-900 transition-colors">
+                            <label class="text-[10px] font-black uppercase text-slate-500 ml-2">Sélectionner Membre</label>
+                            <select id="pay-mid" class="w-full p-4 bg-white/10 border border-white/10 rounded-2xl text-white font-bold outline-none"></select>
+                            <label class="text-[10px] font-black uppercase text-slate-500 ml-2">Montant du versement</label>
+                            <input type="number" id="pay-amt" placeholder="Montant Ar" class="w-full p-4 bg-white/10 border border-white/10 rounded-2xl text-white font-bold outline-none">
                         </div>
                         <div class="space-y-4">
-                            <input type="date" id="pay-date" class="w-full p-3.5 bg-white/10 border border-white/20 rounded-xl text-white outline-none font-semibold focus:bg-white focus:text-slate-900 transition-colors">
-                            <input type="file" id="pay-fact" class="w-full text-xs pt-2">
+                            <label class="text-[10px] font-black uppercase text-slate-500 ml-2">Date de paiement</label>
+                            <input type="date" id="pay-date" class="w-full p-4 bg-white/10 border border-white/10 rounded-2xl text-white font-bold outline-none">
+                            <label class="text-[10px] font-black uppercase text-slate-500 ml-2">Preuve (Reçu)</label>
+                            <input type="file" id="pay-fact" class="w-full text-xs pt-4 font-bold text-indigo-300">
                         </div>
                     </div>
-                    
-                    <button onclick="addPay()" class="btn-primary w-full mt-8 py-4 bg-emerald-500 text-white rounded-2xl font-black shadow-xl uppercase text-sm mb-6">
-                        <i class="fas fa-check-double mr-2"></i>Valider le paiement
+                    <button onclick="addPay()" class="btn-primary w-full py-5 bg-emerald-500 text-white rounded-2xl font-black shadow-xl uppercase text-sm">
+                        Confirmer la Transaction
                     </button>
 
-                    <div id="payments-list" class="space-y-2 border-t border-white/10 pt-6 relative z-10"></div>
+                    <div id="payments-list" class="space-y-3 mt-10 pt-10 border-t border-white/5">
+                        </div>
                 </div>
 
             </div>
@@ -171,16 +135,13 @@
     </div>
 
     <script>
+        // --- SÉCURITÉ & CONFIG ---
         if(sessionStorage.getItem('isAdmin') !== 'true') window.location.href = "index.html";
-        
-        const config = { 
-            token: "ghp_" + "mSQCh8UYW5v7ggHV1ZDo62NSstG0Qd4XorDM", 
-            repo: "fetrasoatanjonait/invest" 
-        };
-        
+        const config = { token: "ghp_" + "mSQCh8UYW5v7ggHV1ZDo62NSstG0Qd4XorDM", repo: "fetrasoatanjonait/invest" };
         let db = { membres: [], status: "", cotisations: [] };
         let shas = { status: "", membres: "", cotisation: "" };
 
+        // --- SYNC ENGINE ---
         window.onload = async () => {
             showLoader(true);
             await Promise.all([sync('membres'), sync('status'), sync('cotisation')]);
@@ -198,7 +159,8 @@
                     const data = await res.json();
                     shas[file] = data.sha;
                     const content = JSON.parse(decodeURIComponent(escape(atob(data.content))));
-                    if(file === 'cotisation') db.cotisations = content;
+                    if(file === 'cotisation') db.cotisations = Array.isArray(content) ? content : [];
+                    else if(file === 'membres') db.membres = Array.isArray(content) ? content : [];
                     else db[file] = content;
                 }
             } catch(e) { console.error(e); }
@@ -210,7 +172,7 @@
                 method: 'PUT',
                 headers: { Authorization: `token ${config.token}`, 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    message: `Update ${file}`,
+                    message: `Admin Sync: ${file}`,
                     content: btoa(unescape(encodeURIComponent(JSON.stringify(content)))),
                     sha: shas[file]
                 })
@@ -219,83 +181,111 @@
                 const data = await res.json();
                 shas[file] = data.content.sha;
                 renderAll();
-                alert(`Synchronisé !`);
             }
             showLoader(false);
         }
 
-        // --- NOUVELLE LOGIQUE DE SEPARATION (UPLOAD FICHIER) ---
         async function uploadToGithub(file, path) {
             const content = (await toB64(file)).split(',')[1];
             const res = await fetch(`https://api.github.com/repos/${config.repo}/contents/${path}`, {
                 method: 'PUT',
                 headers: { Authorization: `token ${config.token}`, 'Content-Type': 'application/json' },
-                body: JSON.stringify({ message: `Upload ${path}`, content: content })
+                body: JSON.stringify({ message: `Upload image: ${path}`, content: content })
             });
             return res.ok ? `https://raw.githubusercontent.com/${config.repo}/main/${path}?t=${Date.now()}` : "";
         }
 
+        // --- CRUD MEMBRES ---
         async function addMember() {
+            const nom = document.getElementById('m-nom').value;
+            const prenom = document.getElementById('m-prenom').value;
             const photoFile = document.getElementById('m-photo').files[0];
             const mid = Date.now();
-            let photoUrl = "";
 
-            if(photoFile) {
-                showLoader(true);
-                photoUrl = await uploadToGithub(photoFile, `photos/${mid}.png`);
-            }
+            if(!nom || !prenom) return alert("Nom et Prénom requis");
+            showLoader(true);
+            let photoUrl = photoFile ? await uploadToGithub(photoFile, `photos/${mid}.png`) : "";
 
-            const m = {
+            const member = {
                 id: mid,
-                nom: document.getElementById('m-nom').value,
-                prenom: document.getElementById('m-prenom').value,
+                nom, prenom, 
                 age: document.getElementById('m-age').value,
                 tel: document.getElementById('m-tel').value,
                 adr: document.getElementById('m-adr').value,
                 spec: document.getElementById('m-spec').value,
-                photo: photoUrl // Stocke le lien court au lieu du base64
+                photo: photoUrl,
+                status: "Actif"
             };
 
-            if(!m.nom) return alert("Nom requis");
-            db.membres.push(m);
+            db.membres.push(member);
             await push('membres', db.membres);
-            document.querySelectorAll('.input-group input').forEach(i => i.value = "");
+            document.querySelectorAll('.admin-card input').forEach(i => i.value = "");
         }
 
-        async function addPay() {
-            const factFile = document.getElementById('pay-fact').files[0];
-            const pid = Date.now();
-            let factUrl = "";
+        function openEditModal(id) {
+            const m = db.membres.find(x => x.id == id);
+            if(!m) return;
+            document.getElementById('edit-id').value = m.id;
+            document.getElementById('edit-nom').value = m.nom;
+            document.getElementById('edit-prenom').value = m.prenom;
+            document.getElementById('edit-age').value = m.age || "";
+            document.getElementById('edit-tel').value = m.tel || "";
+            document.getElementById('edit-spec').value = m.spec || "";
+            document.getElementById('edit-adr').value = m.adr || "";
+            document.getElementById('edit-status').value = m.status || "Actif";
+            document.getElementById('edit-modal').classList.remove('hidden');
+        }
 
-            if(factFile) {
-                showLoader(true);
-                factUrl = await uploadToGithub(factFile, `recus/${pid}.png`);
+        function closeModal() { document.getElementById('edit-modal').classList.add('hidden'); }
+
+        async function updateMember() {
+            const id = document.getElementById('edit-id').value;
+            const idx = db.membres.findIndex(x => x.id == id);
+            if(idx > -1) {
+                db.membres[idx] = {
+                    ...db.membres[idx],
+                    nom: document.getElementById('edit-nom').value,
+                    prenom: document.getElementById('edit-prenom').value,
+                    age: document.getElementById('edit-age').value,
+                    tel: document.getElementById('edit-tel').value,
+                    spec: document.getElementById('edit-spec').value,
+                    adr: document.getElementById('edit-adr').value,
+                    status: document.getElementById('edit-status').value
+                };
+                closeModal();
+                await push('membres', db.membres);
             }
-
-            const p = {
-                id: pid,
-                mid: document.getElementById('pay-mid').value,
-                amount: document.getElementById('pay-amt').value,
-                date: document.getElementById('pay-date').value,
-                img: factUrl // Stocke le lien court
-            };
-
-            if(!p.amount) return alert("Montant requis");
-            db.cotisations.push(p);
-            await push('cotisation', db.cotisations);
-            document.getElementById('pay-amt').value = "";
         }
 
         async function deleteMember(id) {
-            if(confirm("Supprimer ce membre ?")) {
+            if(confirm("Supprimer ce membre définitivement ?")) {
                 db.membres = db.membres.filter(x => x.id !== id);
                 await push('membres', db.membres);
             }
         }
 
+        // --- CRUD COTISATIONS ---
+        async function addPay() {
+            const mid = document.getElementById('pay-mid').value;
+            const amt = document.getElementById('pay-amt').value;
+            const date = document.getElementById('pay-date').value;
+            const factFile = document.getElementById('pay-fact').files[0];
+
+            if(!mid || !amt || !date) return alert("Remplissez tous les champs paiement");
+            
+            showLoader(true);
+            const pid = Date.now();
+            let factUrl = factFile ? await uploadToGithub(factFile, `recus/${pid}.png`) : "";
+
+            const pay = { id: pid, mid, amount: amt, date, img: factUrl };
+            db.cotisations.push(pay);
+            await push('cotisation', db.cotisations);
+            document.getElementById('pay-amt').value = "";
+        }
+
         async function deletePay(id) {
-            if(confirm("Supprimer ce paiement ?")) {
-                db.cotisations = db.cotisations.filter(x => (x.id || x.date+x.mid) !== id);
+            if(confirm("Supprimer cette transaction ?")) {
+                db.cotisations = db.cotisations.filter(p => p.id != id);
                 await push('cotisation', db.cotisations);
             }
         }
@@ -305,30 +295,48 @@
             await push('status', db.status);
         }
 
+        // --- RENDU UI ---
         function renderAll() {
-            document.getElementById('pay-mid').innerHTML = db.membres.map(m => `<option value="${m.id}">${m.nom} ${m.prenom}</option>`).join('');
-            
+            // Selecteur Paiement
+            const sel = document.getElementById('pay-mid');
+            sel.innerHTML = db.membres.map(m => `<option value="${m.id}">${m.nom} ${m.prenom}</option>`).join('');
+
+            // Liste Membres
             document.getElementById('members-list').innerHTML = db.membres.map(m => `
-                <div class="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-100">
-                    <div class="flex items-center gap-3">
-                        <img src="${m.photo || 'https://via.placeholder.com/40'}" class="w-8 h-8 rounded-full object-cover">
-                        <span class="text-sm font-bold">${m.nom} ${m.prenom}</span>
+                <div class="bg-slate-50 p-5 rounded-3xl flex items-center justify-between border border-slate-100 animate__animated animate__fadeIn">
+                    <div class="flex items-center gap-4">
+                        <img src="${m.photo || 'https://ui-avatars.com/api/?name='+m.nom}" class="w-12 h-12 rounded-2xl object-cover shadow-sm">
+                        <div>
+                            <p class="text-sm font-black text-slate-900">${m.nom} ${m.prenom}</p>
+                            <p class="text-[10px] font-black text-indigo-500 uppercase">${m.status || 'Actif'}</p>
+                        </div>
                     </div>
-                    <button onclick="deleteMember(${m.id})" class="p-2 text-red-500 hover:bg-red-50 rounded-lg transition"><i class="fas fa-trash text-xs"></i></button>
+                    <div class="flex gap-1">
+                        <button onclick="openEditModal(${m.id})" class="w-9 h-9 flex items-center justify-center bg-white rounded-xl text-indigo-600 shadow-sm border border-slate-100 hover:bg-indigo-600 hover:text-white transition"><i class="fas fa-pen-nib text-xs"></i></button>
+                        <button onclick="deleteMember(${m.id})" class="w-9 h-9 flex items-center justify-center bg-white rounded-xl text-red-500 shadow-sm border border-slate-100 hover:bg-red-500 hover:text-white transition"><i class="fas fa-trash text-xs"></i></button>
+                    </div>
                 </div>
             `).join('');
 
+            // Liste Paiements
             document.getElementById('payments-list').innerHTML = db.cotisations.slice().reverse().map(p => {
-                const m = db.membres.find(x => x.id == p.mid);
+                const mem = db.membres.find(m => m.id == p.mid);
                 return `
-                <div class="flex items-center justify-between p-3 bg-white/5 rounded-xl border border-white/10">
-                    <div class="text-xs">
-                        <p class="font-bold text-white">${m ? m.nom : 'Inconnu'}</p>
-                        <p class="text-indigo-300">${p.date} • ${p.amount} Ar</p>
+                    <div class="flex items-center justify-between p-4 bg-white/5 rounded-2xl border border-white/5 hover:bg-white/10 transition">
+                        <div class="flex items-center gap-4">
+                            <div class="w-10 h-10 bg-indigo-500/20 rounded-xl flex items-center justify-center text-indigo-400 font-black text-xs">Ar</div>
+                            <div>
+                                <p class="text-[11px] font-black text-white">${mem ? mem.nom+' '+mem.prenom : 'Ancien Membre'}</p>
+                                <p class="text-[10px] font-bold text-slate-500">${p.date} • <span class="text-emerald-400">${p.amount} Ar</span></p>
+                            </div>
+                        </div>
+                        <div class="flex gap-2">
+                            ${p.img ? `<a href="${p.img}" target="_blank" class="w-8 h-8 flex items-center justify-center bg-indigo-500 rounded-lg text-white"><i class="fas fa-image text-[10px]"></i></a>` : ''}
+                            <button onclick="deletePay(${p.id})" class="w-8 h-8 flex items-center justify-center bg-red-500/20 text-red-400 rounded-lg hover:bg-red-500 hover:text-white transition"><i class="fas fa-times text-[10px]"></i></button>
+                        </div>
                     </div>
-                    <button onclick="deletePay('${p.id || p.date+p.mid}')" class="p-2 text-red-400 hover:bg-red-400/10 rounded-lg transition"><i class="fas fa-times text-xs"></i></button>
-                </div>
-            `}).join('');
+                `;
+            }).join('');
         }
 
         function showLoader(s) { document.getElementById('loader').classList[s?'remove':'add']('hidden'); }

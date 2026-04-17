@@ -105,9 +105,7 @@
                 
                 <div class="admin-card p-6 md:p-8">
                     <h3 class="font-extrabold text-lg mb-6 flex items-center gap-3">
-                        <div class="w-10 h-10 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center text-sm">
-                            <i class="fas fa-user-plus"></i>
-                        </div>
+                        <div class="w-10 h-10 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center text-sm"><i class="fas fa-user-plus"></i></div>
                         NOUVEAU MEMBRE
                     </h3>
                     
@@ -115,7 +113,7 @@
                         <div>
                             <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 mb-1.5 block">Identité</label>
                             <div class="space-y-3">
-                                <input type="text" id="m-nom" placeholder="Nom de famille" class="w-full p-3.5 bg-slate-50 rounded-xl outline-none font-semibold">
+                                <input type="text" id="m-nom" placeholder="Nom" class="w-full p-3.5 bg-slate-50 rounded-xl outline-none font-semibold">
                                 <input type="text" id="m-prenom" placeholder="Prénom" class="w-full p-3.5 bg-slate-50 rounded-xl outline-none font-semibold">
                             </div>
                         </div>
@@ -123,64 +121,46 @@
                             <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 mb-1.5 block">Coordonnées</label>
                             <div class="space-y-3">
                                 <input type="number" id="m-age" placeholder="Âge" class="w-full p-3.5 bg-slate-50 rounded-xl outline-none font-semibold">
-                                <input type="text" id="m-tel" placeholder="N° Téléphone" class="w-full p-3.5 bg-slate-50 rounded-xl outline-none font-semibold">
+                                <input type="text" id="m-tel" placeholder="Téléphone" class="w-full p-3.5 bg-slate-50 rounded-xl outline-none font-semibold">
                             </div>
                         </div>
                         <div class="md:col-span-2">
                             <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 mb-1.5 block">Informations Complémentaires</label>
-                            <input type="text" id="m-adr" placeholder="Adresse complète" class="w-full p-3.5 bg-slate-50 rounded-xl outline-none font-semibold mb-3">
-                            <input type="text" id="m-spec" placeholder="Spécialité ou Poste" class="w-full p-3.5 bg-slate-50 rounded-xl outline-none font-semibold">
+                            <input type="text" id="m-adr" placeholder="Adresse" class="w-full p-3.5 bg-slate-50 rounded-xl outline-none font-semibold mb-3">
+                            <input type="text" id="m-spec" placeholder="Poste" class="w-full p-3.5 bg-slate-50 rounded-xl outline-none font-semibold">
                         </div>
                         <div class="md:col-span-2 p-4 border-2 border-dashed border-slate-100 rounded-2xl bg-slate-50/50">
-                            <label class="text-[10px] font-black text-slate-400 block mb-2 uppercase tracking-widest">Photo de Profil (Format Image)</label>
-                            <input type="file" id="m-photo" class="text-xs file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 cursor-pointer w-full">
+                            <label class="text-[10px] font-black text-slate-400 block mb-2 uppercase">Photo de Profil</label>
+                            <input type="file" id="m-photo" class="text-xs w-full">
                         </div>
                     </div>
                     
-                    <button onclick="addMember()" class="btn-primary w-full py-4 bg-indigo-600 text-white rounded-2xl font-black shadow-lg shadow-indigo-100 flex items-center justify-center gap-2 uppercase text-sm tracking-wider mb-6">
-                        <i class="fas fa-plus-circle opacity-50"></i> Enregistrer le nouveau membre
+                    <button onclick="addMember()" class="btn-primary w-full py-4 bg-indigo-600 text-white rounded-2xl font-black shadow-lg uppercase text-sm mb-6">
+                        <i class="fas fa-plus-circle mr-2"></i>Enregistrer le membre
                     </button>
 
                     <div id="members-list" class="space-y-2 border-t pt-6"></div>
                 </div>
 
                 <div class="bg-indigo-900 p-6 md:p-8 rounded-[2rem] shadow-2xl text-white relative overflow-hidden">
-                    <div class="absolute -right-10 -bottom-10 opacity-10">
-                        <i class="fas fa-hand-holding-dollar text-[12rem]"></i>
-                    </div>
-
                     <h3 class="font-extrabold text-lg mb-6 flex items-center gap-3 relative z-10">
-                        <div class="w-10 h-10 bg-white/10 text-indigo-200 rounded-xl flex items-center justify-center text-sm">
-                            <i class="fas fa-coins"></i>
-                        </div>
+                        <div class="w-10 h-10 bg-white/10 text-indigo-200 rounded-xl flex items-center justify-center text-sm"><i class="fas fa-coins"></i></div>
                         ENREGISTRER UNE COTISATION
                     </h3>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-5 relative z-10">
                         <div class="space-y-4">
-                            <div>
-                                <label class="text-[10px] font-bold text-indigo-300 uppercase tracking-widest ml-1 mb-1.5 block">Sélectionner le membre</label>
-                                <select id="pay-mid" class="w-full p-3.5 bg-white/10 border border-white/20 rounded-xl text-white outline-none font-semibold focus:bg-white focus:text-slate-900 transition-colors"></select>
-                            </div>
-                            <div>
-                                <label class="text-[10px] font-bold text-indigo-300 uppercase tracking-widest ml-1 mb-1.5 block">Montant du versement (Ar)</label>
-                                <input type="number" id="pay-amt" placeholder="Ex: 50000" class="w-full p-3.5 bg-white/10 border border-white/20 rounded-xl text-white outline-none font-semibold focus:bg-white focus:text-slate-900 transition-colors placeholder:text-indigo-200/50">
-                            </div>
+                            <select id="pay-mid" class="w-full p-3.5 bg-white/10 border border-white/20 rounded-xl text-white outline-none font-semibold focus:bg-white focus:text-slate-900 transition-colors"></select>
+                            <input type="number" id="pay-amt" placeholder="Montant (Ar)" class="w-full p-3.5 bg-white/10 border border-white/20 rounded-xl text-white outline-none font-semibold focus:bg-white focus:text-slate-900 transition-colors">
                         </div>
                         <div class="space-y-4">
-                            <div>
-                                <label class="text-[10px] font-bold text-indigo-300 uppercase tracking-widest ml-1 mb-1.5 block">Date de réception</label>
-                                <input type="date" id="pay-date" class="w-full p-3.5 bg-white/10 border border-white/20 rounded-xl text-white outline-none font-semibold focus:bg-white focus:text-slate-900 transition-colors">
-                            </div>
-                            <div>
-                                <label class="text-[10px] font-bold text-indigo-300 uppercase tracking-widest ml-1 mb-1.5 block">Preuve de paiement (Scan/Photo)</label>
-                                <input type="file" id="pay-fact" class="w-full text-xs file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-white/10 file:text-white hover:file:bg-white/20 cursor-pointer pt-2">
-                            </div>
+                            <input type="date" id="pay-date" class="w-full p-3.5 bg-white/10 border border-white/20 rounded-xl text-white outline-none font-semibold focus:bg-white focus:text-slate-900 transition-colors">
+                            <input type="file" id="pay-fact" class="w-full text-xs pt-2">
                         </div>
                     </div>
                     
-                    <button onclick="addPay()" class="btn-primary w-full mt-8 py-4 bg-emerald-500 text-white rounded-2xl font-black shadow-xl shadow-emerald-900/20 uppercase text-sm tracking-widest flex items-center justify-center gap-2 mb-6">
-                        <i class="fas fa-check-double"></i> Valider et synchroniser le paiement
+                    <button onclick="addPay()" class="btn-primary w-full mt-8 py-4 bg-emerald-500 text-white rounded-2xl font-black shadow-xl uppercase text-sm mb-6">
+                        <i class="fas fa-check-double mr-2"></i>Valider le paiement
                     </button>
 
                     <div id="payments-list" class="space-y-2 border-t border-white/10 pt-6 relative z-10"></div>
@@ -192,33 +172,40 @@
 
     <script>
         if(sessionStorage.getItem('isAdmin') !== 'true') window.location.href = "index.html";
-        const config = { token: "ghp_"+"mSQCh8UYW5v7ggHV1ZDo62NSstG0Qd4XorDM", repo: "fetrasoatanjonait/invest" };
+        
+        const config = { 
+            token: "ghp_" + "mSQCh8UYW5v7ggHV1ZDo62NSstG0Qd4XorDM", 
+            repo: "fetrasoatanjonait/invest" 
+        };
+        
         let db = { membres: [], status: "", cotisations: [] };
         let shas = { status: "", membres: "", cotisation: "" };
 
         window.onload = async () => {
-            document.getElementById('loader').classList.remove('hidden');
+            showLoader(true);
             await Promise.all([sync('membres'), sync('status'), sync('cotisation')]);
             document.getElementById('status-field').value = db.status;
             renderAll();
-            document.getElementById('loader').classList.add('hidden');
+            showLoader(false);
         };
 
         async function sync(file) {
             try {
-                const res = await fetch(`https://api.github.com/repos/${config.repo}/contents/${file}.json`, {
+                const res = await fetch(`https://api.github.com/repos/${config.repo}/contents/${file}.json?t=${Date.now()}`, {
                     headers: { Authorization: `token ${config.token}` }
                 });
                 if(res.ok) {
                     const data = await res.json();
                     shas[file] = data.sha;
-                    db[file === 'cotisation' ? 'cotisations' : file] = JSON.parse(decodeURIComponent(escape(atob(data.content))));
+                    const content = JSON.parse(decodeURIComponent(escape(atob(data.content))));
+                    if(file === 'cotisation') db.cotisations = content;
+                    else db[file] = content;
                 }
             } catch(e) { console.error(e); }
         }
 
         async function push(file, content) {
-            document.getElementById('loader').classList.remove('hidden');
+            showLoader(true);
             const res = await fetch(`https://api.github.com/repos/${config.repo}/contents/${file}.json`, {
                 method: 'PUT',
                 headers: { Authorization: `token ${config.token}`, 'Content-Type': 'application/json' },
@@ -232,62 +219,82 @@
                 const data = await res.json();
                 shas[file] = data.content.sha;
                 renderAll();
-                alert(`Données synchronisées !`);
+                alert(`Synchronisé !`);
             }
-            document.getElementById('loader').classList.add('hidden');
+            showLoader(false);
+        }
+
+        // --- NOUVELLE LOGIQUE DE SEPARATION (UPLOAD FICHIER) ---
+        async function uploadToGithub(file, path) {
+            const content = (await toB64(file)).split(',')[1];
+            const res = await fetch(`https://api.github.com/repos/${config.repo}/contents/${path}`, {
+                method: 'PUT',
+                headers: { Authorization: `token ${config.token}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: `Upload ${path}`, content: content })
+            });
+            return res.ok ? `https://raw.githubusercontent.com/${config.repo}/main/${path}?t=${Date.now()}` : "";
         }
 
         async function addMember() {
             const photoFile = document.getElementById('m-photo').files[0];
+            const mid = Date.now();
+            let photoUrl = "";
+
+            if(photoFile) {
+                showLoader(true);
+                photoUrl = await uploadToGithub(photoFile, `photos/${mid}.png`);
+            }
+
             const m = {
-                id: Date.now(),
+                id: mid,
                 nom: document.getElementById('m-nom').value,
                 prenom: document.getElementById('m-prenom').value,
                 age: document.getElementById('m-age').value,
                 tel: document.getElementById('m-tel').value,
                 adr: document.getElementById('m-adr').value,
                 spec: document.getElementById('m-spec').value,
-                photo: photoFile ? await toB64(photoFile) : null
+                photo: photoUrl // Stocke le lien court au lieu du base64
             };
-            if(!m.nom || !m.prenom) return alert("Nom et Prénom requis");
+
+            if(!m.nom) return alert("Nom requis");
             db.membres.push(m);
             await push('membres', db.membres);
+            document.querySelectorAll('.input-group input').forEach(i => i.value = "");
         }
 
-        async function editMember(id) {
-            const m = db.membres.find(x => x.id === id);
-            const nouveauNom = prompt("Nouveau nom :", m.nom);
-            const nouveauPrenom = prompt("Nouveau prénom :", m.prenom);
-            if(nouveauNom) {
-                m.nom = nouveauNom;
-                m.prenom = nouveauPrenom || m.prenom;
-                await push('membres', db.membres);
+        async function addPay() {
+            const factFile = document.getElementById('pay-fact').files[0];
+            const pid = Date.now();
+            let factUrl = "";
+
+            if(factFile) {
+                showLoader(true);
+                factUrl = await uploadToGithub(factFile, `recus/${pid}.png`);
             }
+
+            const p = {
+                id: pid,
+                mid: document.getElementById('pay-mid').value,
+                amount: document.getElementById('pay-amt').value,
+                date: document.getElementById('pay-date').value,
+                img: factUrl // Stocke le lien court
+            };
+
+            if(!p.amount) return alert("Montant requis");
+            db.cotisations.push(p);
+            await push('cotisation', db.cotisations);
+            document.getElementById('pay-amt').value = "";
         }
 
         async function deleteMember(id) {
-            if(confirm("Supprimer ce membre définitivement ?")) {
+            if(confirm("Supprimer ce membre ?")) {
                 db.membres = db.membres.filter(x => x.id !== id);
                 await push('membres', db.membres);
             }
         }
 
-        async function addPay() {
-            const file = document.getElementById('pay-fact').files[0];
-            const p = {
-                id: Date.now(),
-                mid: document.getElementById('pay-mid').value,
-                amount: document.getElementById('pay-amt').value,
-                date: document.getElementById('pay-date').value,
-                img: file ? await toB64(file) : null
-            };
-            if(!p.amount || !p.date) return alert("Montant et Date requis");
-            db.cotisations.push(p);
-            await push('cotisation', db.cotisations);
-        }
-
         async function deletePay(id) {
-            if(confirm("Supprimer ce versement ?")) {
+            if(confirm("Supprimer ce paiement ?")) {
                 db.cotisations = db.cotisations.filter(x => (x.id || x.date+x.mid) !== id);
                 await push('cotisation', db.cotisations);
             }
@@ -299,37 +306,32 @@
         }
 
         function renderAll() {
-            // Liste déroulante
             document.getElementById('pay-mid').innerHTML = db.membres.map(m => `<option value="${m.id}">${m.nom} ${m.prenom}</option>`).join('');
             
-            // Liste Gestion Membres
-            document.getElementById('members-list').innerHTML = `<p class="text-[10px] font-black text-slate-400 uppercase mb-3">Liste des membres</p>` + 
-                db.membres.map(m => `
+            document.getElementById('members-list').innerHTML = db.membres.map(m => `
                 <div class="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-100">
-                    <span class="text-sm font-bold">${m.nom} ${m.prenom}</span>
-                    <div class="flex gap-2">
-                        <button onclick="editMember(${m.id})" class="p-2 text-indigo-600 hover:bg-indigo-50 rounded-lg transition"><i class="fas fa-edit text-xs"></i></button>
-                        <button onclick="deleteMember(${m.id})" class="p-2 text-red-500 hover:bg-red-50 rounded-lg transition"><i class="fas fa-trash text-xs"></i></button>
+                    <div class="flex items-center gap-3">
+                        <img src="${m.photo || 'https://via.placeholder.com/40'}" class="w-8 h-8 rounded-full object-cover">
+                        <span class="text-sm font-bold">${m.nom} ${m.prenom}</span>
                     </div>
+                    <button onclick="deleteMember(${m.id})" class="p-2 text-red-500 hover:bg-red-50 rounded-lg transition"><i class="fas fa-trash text-xs"></i></button>
                 </div>
             `).join('');
 
-            // Liste Historique Cotisations
-            document.getElementById('payments-list').innerHTML = `<p class="text-[10px] font-bold text-indigo-300 uppercase mb-3">Dernières transactions</p>` + 
-                db.cotisations.slice().reverse().map(p => {
-                    const m = db.membres.find(x => x.id == p.mid);
-                    const uid = p.id || (p.date + p.mid);
-                    return `
-                    <div class="flex items-center justify-between p-3 bg-white/5 rounded-xl border border-white/10">
-                        <div class="text-xs">
-                            <p class="font-bold text-white">${m ? m.nom : 'Inconnu'}</p>
-                            <p class="text-indigo-300">${p.date} • ${p.amount} Ar</p>
-                        </div>
-                        <button onclick="deletePay('${uid}')" class="p-2 text-red-400 hover:bg-red-400/10 rounded-lg transition"><i class="fas fa-times text-xs"></i></button>
+            document.getElementById('payments-list').innerHTML = db.cotisations.slice().reverse().map(p => {
+                const m = db.membres.find(x => x.id == p.mid);
+                return `
+                <div class="flex items-center justify-between p-3 bg-white/5 rounded-xl border border-white/10">
+                    <div class="text-xs">
+                        <p class="font-bold text-white">${m ? m.nom : 'Inconnu'}</p>
+                        <p class="text-indigo-300">${p.date} • ${p.amount} Ar</p>
                     </div>
-                `}).join('');
+                    <button onclick="deletePay('${p.id || p.date+p.mid}')" class="p-2 text-red-400 hover:bg-red-400/10 rounded-lg transition"><i class="fas fa-times text-xs"></i></button>
+                </div>
+            `}).join('');
         }
 
+        function showLoader(s) { document.getElementById('loader').classList[s?'remove':'add']('hidden'); }
         const toB64 = f => new Promise(res => { const r = new FileReader(); r.onload = () => res(r.result); r.readAsDataURL(f); });
     </script>
 </body>

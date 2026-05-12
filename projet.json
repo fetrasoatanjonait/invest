@@ -1,1 +1,1 @@
-[{"id":1778606071207,"nom":"d","description":"dfgfdgdg","dateDebut":"2026-05-12","dateFin":"2026-05-15","fonds":[],"depenses":[],"revenus":[],"dateCreation":"2026-05-12"}]
+[{"id":1778606071207,"nom":"d","description":"dfgfdgdg","dateDebut":"2026-05-12","dateFin":"2026-05-15","fonds":[{"id":1778608762291,"source":"ttt","amount":"10000","date":"2026-05-12","img":""}],"depenses":[],"revenus":[],"dateCreation":"2026-05-12"}]

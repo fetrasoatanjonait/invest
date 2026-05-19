@@ -167,6 +167,14 @@
                 <i class="fas fa-history"></i>
                 <span>Historique</span>
             </a>
+            <a onclick="tab('expenses'); toggleSidebar(false)" id="b-expenses" class="nav-link">
+                <i class="fas fa-receipt"></i>
+                <span>Dépenses</span>
+            </a>
+            <a onclick="tab('projects'); toggleSidebar(false)" id="b-projects" class="nav-link">
+                <i class="fas fa-project-diagram"></i>
+                <span>Projets</span>
+            </a>
         </nav>
 
         <div class="border-t border-slate-100 pt-6 mt-6">
@@ -184,7 +192,7 @@
             <p class="text-sm text-slate-500 font-medium">Espace Privé</p>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
             <div class="stat-card">
                 <div class="stat-icon bg-indigo-50 text-indigo-600">
                     <i class="fas fa-vault"></i>
@@ -196,12 +204,22 @@
             </div>
 
             <div class="stat-card">
-                <div class="stat-icon bg-emerald-50 text-emerald-600">
-                    <i class="fas fa-calendar-check"></i>
+                <div class="stat-icon bg-red-50 text-red-600">
+                    <i class="fas fa-money-bill-transfer"></i>
                 </div>
                 <div>
-                    <p class="text-xs font-bold uppercase text-slate-400 tracking-wider mb-0.5">Dernier versement</p>
-                    <h2 id="last-pay" class="text-xl font-bold text-slate-700 italic">--/--/--</h2>
+                    <p class="text-xs font-bold uppercase text-slate-400 tracking-wider mb-0.5">Total Dépensé</p>
+                    <h2 id="total-expenses" class="text-2xl font-extrabold text-slate-950">Chargement...</h2>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon bg-emerald-50 text-emerald-600">
+                    <i class="fas fa-wallet"></i>
+                </div>
+                <div>
+                    <p class="text-xs font-bold uppercase text-slate-400 tracking-wider mb-0.5">Solde Final</p>
+                    <h2 id="final-balance" class="text-2xl font-extrabold text-slate-950">Chargement...</h2>
                 </div>
             </div>
 
@@ -246,6 +264,28 @@
                 </div>
             </div>
         </section>
+
+        <section id="p-expenses" class="page-view hidden animate__animated animate__fadeIn animate__faster">
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-slate-50 border-b border-slate-100">
+                                <th class="px-6 py-4 text-[11px] font-black uppercase text-slate-400 tracking-widest">Description</th>
+                                <th class="px-6 py-4 text-[11px] font-black uppercase text-slate-400 tracking-widest">Date</th>
+                                <th class="px-6 py-4 text-[11px] font-black uppercase text-slate-400 tracking-widest">Montant</th>
+                                <th class="px-6 py-4 text-[11px] font-black uppercase text-slate-400 tracking-widest text-right">Preuve</th>
+                            </tr>
+                        </thead>
+                        <tbody id="list-expenses" class="divide-y divide-slate-100"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <section id="p-projects" class="page-view hidden animate__animated animate__fadeIn animate__faster">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="list-projects"></div>
+        </section>
     </main>
 
     <div id="sidebar-overlay" onclick="toggleSidebar(false)" class="fixed inset-0 bg-slate-900/50 z-30 hidden transition-opacity duration-300 opacity-0"></div>
@@ -259,10 +299,10 @@
 
     <script>
         const config = { token: "ghp_"+"mSQCh8UYW5v7ggHV1ZDo62NSstG0Qd4XorDM", repo: "fetrasoatanjonait/invest" };
-        let db = { membres: [], status: "", cotisations: [] };
+        let db = { membres: [], status: "", cotisations: [], depenses: [], projets: [] };
 
         window.onload = async () => {
-            await Promise.all([sync('membres'), sync('status'), sync('cotisation')]);
+            await Promise.all([sync('membres'), sync('status'), sync('cotisation'), sync('depense'), sync('projet')]);
             render();
         };
 
@@ -273,16 +313,23 @@
                 });
                 if(res.ok) {
                     const data = await res.json();
-                    db[file === 'cotisation' ? 'cotisations' : file] = JSON.parse(decodeURIComponent(escape(atob(data.content))));
+                    if(file === 'cotisation') db.cotisations = JSON.parse(decodeURIComponent(escape(atob(data.content))));
+                    else if(file === 'depense') db.depenses = JSON.parse(decodeURIComponent(escape(atob(data.content))));
+                    else if(file === 'projet') db.projets = JSON.parse(decodeURIComponent(escape(atob(data.content))));
+                    else db[file] = JSON.parse(decodeURIComponent(escape(atob(data.content))));
                 }
             } catch (e) { console.error("Erreur de synchro", e); }
         }
 
         function render() {
-            const total = db.cotisations.reduce((acc, c) => acc + parseFloat(c.amount), 0);
-            document.getElementById('total-cash').innerText = total.toLocaleString() + " Ar";
+            const totalCotisations = (db.cotisations || []).reduce((acc, c) => acc + parseFloat(c.amount || 0), 0);
+            const totalDepenses = (db.depenses || []).reduce((acc, d) => acc + parseFloat(d.amount || 0), 0);
+            const soldeFinal = totalCotisations - totalDepenses;
+            
+            document.getElementById('total-cash').innerText = totalCotisations.toLocaleString() + " Ar";
+            document.getElementById('total-expenses').innerText = totalDepenses.toLocaleString() + " Ar";
+            document.getElementById('final-balance').innerText = soldeFinal.toLocaleString() + " Ar";
             document.getElementById('member-count').innerText = db.membres.length;
-            document.getElementById('last-pay').innerText = db.cotisations.length > 0 ? db.cotisations[db.cotisations.length-1].date : "--/--/--";
             
             document.getElementById('statuts-content').innerText = db.status;
 
@@ -332,10 +379,78 @@
                     </td>
                 </tr>`;
             }).join('');
+
+            document.getElementById('list-expenses').innerHTML = (db.depenses || []).map(d => {
+                return `
+                <tr class="hover:bg-slate-50 transition-colors">
+                    <td class="px-6 py-4">
+                        <div class="font-bold text-slate-900">${d.description}</div>
+                    </td>
+                    <td class="px-6 py-4 text-slate-500 font-medium text-sm">
+                        ${d.date}
+                    </td>
+                    <td class="px-6 py-4">
+                        <span class="font-extrabold text-red-600 text-sm">
+                            - ${parseFloat(d.amount).toLocaleString()} Ar
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 text-right">
+                        ${d.img ? `
+                            <button onclick="zoom('${d.img}')" class="inline-flex items-center gap-1.5 text-indigo-600 font-bold text-xs uppercase tracking-wider hover:text-indigo-800">
+                                <i class="fas fa-receipt"></i> Voir
+                            </button>` : '<span class="text-slate-300">---</span>'}
+                    </td>
+                </tr>`;
+            }).join('');
+
+            // Affichage des projets
+            document.getElementById('list-projects').innerHTML = (db.projets || []).map(p => {
+                const totalFonds = (p.fonds || []).reduce((acc, f) => acc + parseFloat(f.amount || 0), 0);
+                const totalDepenses = (p.depenses || []).reduce((acc, d) => acc + parseFloat(d.amount || 0), 0);
+                const totalRevenus = (p.revenus || []).reduce((acc, r) => acc + parseFloat(r.amount || 0), 0);
+                const solde = totalFonds + totalRevenus - totalDepenses;
+                
+                return `
+                <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm group transition-all hover:shadow-md hover:border-slate-200 cursor-pointer" onclick="openProject(${p.id})">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="w-12 h-12 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center overflow-hidden">
+                            ${p.logo ? `<img src="${p.logo}" class="w-full h-full object-cover">` : `<span class="text-white font-black text-lg">${p.nom ? p.nom.charAt(0).toUpperCase() : 'P'}</span>`}
+                        </div>
+                        <span class="text-xs font-bold px-3 py-1 rounded-full ${solde >= 0 ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'}">
+                            ${solde >= 0 ? 'Actif' : 'Déficit'}
+                        </span>
+                    </div>
+                    <h4 class="font-extrabold text-lg text-slate-950 mb-2">${p.nom || 'Projet sans nom'}</h4>
+                    <p class="text-sm text-slate-600 mb-4 line-clamp-2">${p.description || 'Aucune description'}</p>
+                    
+                    <div class="space-y-2">
+                        <div class="flex justify-between items-center text-sm">
+                            <span class="text-slate-500">Fonds:</span>
+                            <span class="font-bold text-indigo-600">${totalFonds.toLocaleString()} Ar</span>
+                        </div>
+                        <div class="flex justify-between items-center text-sm">
+                            <span class="text-slate-500">Dépenses:</span>
+                            <span class="font-bold text-red-600">${totalDepenses.toLocaleString()} Ar</span>
+                        </div>
+                        <div class="flex justify-between items-center text-sm">
+                            <span class="text-slate-500">Revenus:</span>
+                            <span class="font-bold text-emerald-600">${totalRevenus.toLocaleString()} Ar</span>
+                        </div>
+                        <div class="pt-2 mt-2 border-t border-slate-100">
+                            <div class="flex justify-between items-center">
+                                <span class="text-xs font-bold text-slate-400 uppercase">Solde:</span>
+                                <span class="font-extrabold text-lg ${solde >= 0 ? 'text-emerald-600' : 'text-red-600'}">
+                                    ${solde.toLocaleString()} Ar
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
+            }).join('');
         }
 
         // Mapping des titres de page
-        const titles = { 'membres': 'Annuaire des Membres', 'statuts': 'Statuts de l\'Association', 'history': 'Historique des Versements' };
+        const titles = { 'membres': 'Annuaire des Membres', 'statuts': 'Statuts de l\'Association', 'history': 'Historique des Versements', 'expenses': 'Historique des Dépenses', 'projects': 'Projets en Cours' };
 
         function tab(id) {
             // Update Title
@@ -351,6 +466,12 @@
         }
 
         function zoom(s) { if(s) { document.getElementById('z-img').src=s; document.getElementById('zoom').classList.remove('hidden'); } }
+        
+        function openProject(projectId) {
+            // Stocker l'ID du projet et rediriger vers la page du projet
+            sessionStorage.setItem('currentProjectId', projectId);
+            window.location.href = `project.html?id=${projectId}`;
+        }
 
         function loginRedirect() {
             const user = prompt("Identifiant :");

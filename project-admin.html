@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>InvestPro - Administration Projet</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f8fafc; color: #1e293b; }
+        .admin-card { background: white; border-radius: 24px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); }
+        .btn-primary { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.3); }
+        .spinner { width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid #4f46e5; border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body class="p-4 md:p-8 lg:p-12">
+
+    <div id="loader" class="fixed inset-0 bg-slate-900/60 z-[400] hidden flex flex-col items-center justify-center text-white">
+        <div class="spinner mb-4"></div>
+        <p class="font-bold tracking-widest text-sm animate-pulse uppercase">Traitement en cours...</p>
+    </div>
+
+    <div class="max-w-7xl mx-auto">
+        <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-12 gap-6">
+            <div>
+                <h1 class="text-4xl font-black text-slate-900 tracking-tighter">ADMIN PROJET</h1>
+                <p id="project-name" class="text-purple-600 font-bold uppercase text-xs tracking-[0.3em] flex items-center gap-2 mt-2">
+                    <span class="w-2 h-2 bg-purple-600 rounded-full animate-ping"></span> Chargement...
+                </p>
+            </div>
+            <div class="flex gap-4">
+                <button onclick="window.location.href='admin.html'" class="px-8 py-4 bg-white border border-slate-200 rounded-2xl font-black text-slate-500 hover:bg-slate-50 transition shadow-sm">
+                    RETOUR ADMIN
+                </button>
+                <button onclick="viewProject()" class="px-8 py-4 bg-purple-600 text-white rounded-2xl font-black hover:bg-purple-700 transition shadow-sm">
+                    VOIR PROJET
+                </button>
+            </div>
+        </header>
+
+        <!-- Statistiques du projet -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div class="admin-card p-6">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 bg-indigo-100 rounded-xl flex items-center justify-center">
+                        <i class="fas fa-coins text-indigo-600 text-lg"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs font-bold text-slate-500 uppercase">Total Fonds</p>
+                        <h3 id="stat-funds" class="text-xl font-black text-slate-900">0 Ar</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="admin-card p-6">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center">
+                        <i class="fas fa-money-bill-transfer text-red-600 text-lg"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs font-bold text-slate-500 uppercase">Total Dépenses</p>
+                        <h3 id="stat-expenses" class="text-xl font-black text-slate-900">0 Ar</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="admin-card p-6">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center">
+                        <i class="fas fa-chart-line text-emerald-600 text-lg"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs font-bold text-slate-500 uppercase">Total Revenus</p>
+                        <h3 id="stat-revenue" class="text-xl font-black text-slate-900">0 Ar</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="admin-card p-6">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
+                        <i class="fas fa-wallet text-purple-600 text-lg"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs font-bold text-slate-500 uppercase">Solde Final</p>
+                        <h3 id="stat-balance" class="text-xl font-black text-slate-900">0 Ar</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modification du logo -->
+        <div class="admin-card p-8 mb-8">
+            <h3 class="font-black text-sm mb-6 uppercase text-purple-600 tracking-widest flex items-center gap-2">
+                <i class="fas fa-image"></i> Logo du Projet
+            </h3>
+            <div class="flex items-center gap-6">
+                <div id="current-logo-container" class="w-20 h-20 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center overflow-hidden shadow-lg">
+                    <span id="current-logo-placeholder" class="text-white font-black text-2xl">P</span>
+                    <img id="current-logo" src="" class="w-full h-full object-cover hidden">
+                </div>
+                <div class="flex-1">
+                    <div class="p-4 border-2 border-dashed border-purple-200 rounded-xl bg-purple-50 flex items-center justify-between">
+                        <span class="text-xs font-bold text-purple-600">Changer le logo</span>
+                        <input type="file" id="project-logo" class="text-xs font-bold text-purple-600">
+                    </div>
+                    <button onclick="updateLogo()" class="btn-primary mt-4 px-6 py-3 bg-purple-600 text-white rounded-xl font-black shadow-lg uppercase text-xs tracking-widest">
+                        Mettre à jour le logo
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            
+            <!-- Gestion des Fonds -->
+            <div class="lg:col-span-1">
+                <div class="admin-card p-8">
+                    <h3 class="font-black text-sm mb-6 uppercase text-indigo-600 tracking-widest flex items-center gap-2">
+                        <i class="fas fa-coins"></i> Ajouter des Fonds
+                    </h3>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="text-[10px] font-black uppercase text-slate-500 ml-2">Source des fonds</label>
+                            <input type="text" id="fund-source" placeholder="Ex: Dotation, Subvention, etc." class="w-full p-4 bg-slate-50 border rounded-2xl font-bold">
+                        </div>
+                        <div>
+                            <label class="text-[10px] font-black uppercase text-slate-500 ml-2">Montant</label>
+                            <input type="number" id="fund-amount" placeholder="Montant Ar" class="w-full p-4 bg-slate-50 border rounded-2xl font-bold">
+                        </div>
+                        <div>
+                            <label class="text-[10px] font-black uppercase text-slate-500 ml-2">Date</label>
+                            <input type="date" id="fund-date" class="w-full p-4 bg-slate-50 border rounded-2xl font-bold">
+                        </div>
+                        <div>
+                            <label class="text-[10px] font-black uppercase text-slate-500 ml-2">Preuve (Reçu)</label>
+                            <input type="file" id="fund-proof" class="w-full text-xs pt-4 font-bold text-indigo-600">
+                        </div>
+                    </div>
+                    <button onclick="addFund()" class="btn-primary w-full mt-6 py-4 bg-indigo-600 text-white rounded-2xl font-black shadow-lg uppercase text-xs tracking-widest">
+                        Ajouter les Fonds
+                    </button>
+
+                    <div id="funds-list" class="space-y-3 mt-8 pt-8 border-t border-slate-100">
+                        <!-- Liste des fonds -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gestion des Dépenses -->
+            <div class="lg:col-span-1">
+                <div class="admin-card p-8">
+                    <h3 class="font-black text-sm mb-6 uppercase text-red-600 tracking-widest flex items-center gap-2">
+                        <i class="fas fa-money-bill-transfer"></i> Ajouter une Dépense
+                    </h3>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="text-[10px] font-black uppercase text-slate-500 ml-2">Description</label>
+                            <input type="text" id="expense-desc" placeholder="Ex: Matériel, Salaires, etc." class="w-full p-4 bg-slate-50 border rounded-2xl font-bold">
+                        </div>
+                        <div>
+                            <label class="text-[10px] font-black uppercase text-slate-500 ml-2">Montant</label>
+                            <input type="number" id="expense-amount" placeholder="Montant Ar" class="w-full p-4 bg-slate-50 border rounded-2xl font-bold">
+                        </div>
+                        <div>
+                            <label class="text-[10px] font-black uppercase text-slate-500 ml-2">Date</label>
+                            <input type="date" id="expense-date" class="w-full p-4 bg-slate-50 border rounded-2xl font-bold">
+                        </div>
+                        <div>
+                            <label class="text-[10px] font-black uppercase text-slate-500 ml-2">Preuve (Facture)</label>
+                            <input type="file" id="expense-proof" class="w-full text-xs pt-4 font-bold text-red-600">
+                        </div>
+                    </div>
+                    <button onclick="addExpense()" class="btn-primary w-full mt-6 py-4 bg-red-600 text-white rounded-2xl font-black shadow-lg uppercase text-xs tracking-widest">
+                        Ajouter la Dépense
+                    </button>
+
+                    <div id="expenses-list" class="space-y-3 mt-8 pt-8 border-t border-slate-100">
+                        <!-- Liste des dépenses -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gestion des Revenus -->
+            <div class="lg:col-span-1">
+                <div class="admin-card p-8">
+                    <h3 class="font-black text-sm mb-6 uppercase text-emerald-600 tracking-widest flex items-center gap-2">
+                        <i class="fas fa-chart-line"></i> Ajouter un Revenu
+                    </h3>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="text-[10px] font-black uppercase text-slate-500 ml-2">Source du revenu</label>
+                            <input type="text" id="revenue-source" placeholder="Ex: Vente, Service, etc." class="w-full p-4 bg-slate-50 border rounded-2xl font-bold">
+                        </div>
+                        <div>
+                            <label class="text-[10px] font-black uppercase text-slate-500 ml-2">Montant</label>
+                            <input type="number" id="revenue-amount" placeholder="Montant Ar" class="w-full p-4 bg-slate-50 border rounded-2xl font-bold">
+                        </div>
+                        <div>
+                            <label class="text-[10px] font-black uppercase text-slate-500 ml-2">Date</label>
+                            <input type="date" id="revenue-date" class="w-full p-4 bg-slate-50 border rounded-2xl font-bold">
+                        </div>
+                        <div>
+                            <label class="text-[10px] font-black uppercase text-slate-500 ml-2">Preuve (Reçu)</label>
+                            <input type="file" id="revenue-proof" class="w-full text-xs pt-4 font-bold text-emerald-600">
+                        </div>
+                    </div>
+                    <button onclick="addRevenue()" class="btn-primary w-full mt-6 py-4 bg-emerald-600 text-white rounded-2xl font-black shadow-lg uppercase text-xs tracking-widest">
+                        Ajouter le Revenu
+                    </button>
+
+                    <div id="revenue-list" class="space-y-3 mt-8 pt-8 border-t border-slate-100">
+                        <!-- Liste des revenus -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- SÉCURITÉ & CONFIG ---
+        if(sessionStorage.getItem('isAdmin') !== 'true') window.location.href = "index.html";
+        const config = { token: "ghp_" + "mSQCh8UYW5v7ggHV1ZDo62NSstG0Qd4XorDM", repo: "fetrasoatanjonait/invest" };
+        let currentProject = null;
+        let db = { projets: [] };
+        let projectSha = "";
+
+        // --- SYNC ENGINE ---
+        window.onload = async () => {
+            showLoader(true);
+            
+            const urlParams = new URLSearchParams(window.location.search);
+            const projectId = urlParams.get('id') || sessionStorage.getItem('currentProjectId');
+            
+            if (!projectId) {
+                alert('Aucun projet sélectionné');
+                window.location.href = 'admin.html';
+                return;
+            }
+
+            await sync('projet');
+            currentProject = db.projets.find(p => p.id == projectId);
+            
+            if (!currentProject) {
+                alert('Projet non trouvé');
+                window.location.href = 'admin.html';
+                return;
+            }
+
+            renderAll();
+            showLoader(false);
+        };
+
+        async function sync(file) {
+            try {
+                const res = await fetch(`https://api.github.com/repos/${config.repo}/contents/${file}.json?t=${Date.now()}`, {
+                    headers: { Authorization: `token ${config.token}` }
+                });
+                if(res.ok) {
+                    const data = await res.json();
+                    if(file === 'projet') {
+                        projectSha = data.sha;
+                        db.projets = Array.isArray(JSON.parse(decodeURIComponent(escape(atob(data.content))))) ? JSON.parse(decodeURIComponent(escape(atob(data.content)))) : [];
+                    }
+                }
+            } catch(e) { console.error(e); }
+        }
+
+        async function push(content) {
+            showLoader(true);
+            const res = await fetch(`https://api.github.com/repos/${config.repo}/contents/projet.json`, {
+                method: 'PUT',
+                headers: { Authorization: `token ${config.token}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    message: `Project Update: ${currentProject.nom}`,
+                    content: btoa(unescape(encodeURIComponent(JSON.stringify(db.projets)))),
+                    sha: projectSha
+                })
+            });
+            if(res.ok) {
+                const data = await res.json();
+                projectSha = data.content.sha;
+                renderAll();
+            }
+            showLoader(false);
+        }
+
+        async function uploadToGithub(file, path) {
+            const content = (await toB64(file)).split(',')[1];
+            const res = await fetch(`https://api.github.com/repos/${config.repo}/contents/${path}`, {
+                method: 'PUT',
+                headers: { Authorization: `token ${config.token}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: `Upload file: ${path}`, content: content })
+            });
+            return res.ok ? `https://raw.githubusercontent.com/${config.repo}/main/${path}?t=${Date.now()}` : "";
+        }
+
+        // --- CRUD FONDS ---
+        async function addFund() {
+            const source = document.getElementById('fund-source').value;
+            const amount = document.getElementById('fund-amount').value;
+            const date = document.getElementById('fund-date').value;
+            const proofFile = document.getElementById('fund-proof').files[0];
+
+            if(!source || !amount || !date) return alert("Remplissez tous les champs fonds");
+            
+            showLoader(true);
+            const fundId = Date.now();
+            let proofUrl = proofFile ? await uploadToGithub(proofFile, `project-funds/${fundId}.png`) : "";
+
+            const fund = { id: fundId, source, amount, date, img: proofUrl };
+            
+            if(!currentProject.fonds) currentProject.fonds = [];
+            currentProject.fonds.push(fund);
+            
+            const projectIndex = db.projets.findIndex(p => p.id == currentProject.id);
+            db.projets[projectIndex] = currentProject;
+            
+            await push(db.projets);
+            
+            // Vider le formulaire
+            document.getElementById('fund-source').value = "";
+            document.getElementById('fund-amount').value = "";
+            document.getElementById('fund-date').value = "";
+            document.getElementById('fund-proof').value = "";
+        }
+
+        async function deleteFund(id) {
+            if(confirm("Supprimer ce fonds ?")) {
+                currentProject.fonds = currentProject.fonds.filter(f => f.id != id);
+                const projectIndex = db.projets.findIndex(p => p.id == currentProject.id);
+                db.projets[projectIndex] = currentProject;
+                await push(db.projets);
+            }
+        }
+
+        // --- CRUD DÉPENSES ---
+        async function addExpense() {
+            const desc = document.getElementById('expense-desc').value;
+            const amount = document.getElementById('expense-amount').value;
+            const date = document.getElementById('expense-date').value;
+            const proofFile = document.getElementById('expense-proof').files[0];
+
+            if(!desc || !amount || !date) return alert("Remplissez tous les champs dépense");
+            
+            showLoader(true);
+            const expenseId = Date.now();
+            let proofUrl = proofFile ? await uploadToGithub(proofFile, `project-expenses/${expenseId}.png`) : "";
+
+            const expense = { id: expenseId, description: desc, amount, date, img: proofUrl };
+            
+            if(!currentProject.depenses) currentProject.depenses = [];
+            currentProject.depenses.push(expense);
+            
+            const projectIndex = db.projets.findIndex(p => p.id == currentProject.id);
+            db.projets[projectIndex] = currentProject;
+            
+            await push(db.projets);
+            
+            // Vider le formulaire
+            document.getElementById('expense-desc').value = "";
+            document.getElementById('expense-amount').value = "";
+            document.getElementById('expense-date').value = "";
+            document.getElementById('expense-proof').value = "";
+        }
+
+        async function deleteExpense(id) {
+            if(confirm("Supprimer cette dépense ?")) {
+                currentProject.depenses = currentProject.depenses.filter(d => d.id != id);
+                const projectIndex = db.projets.findIndex(p => p.id == currentProject.id);
+                db.projets[projectIndex] = currentProject;
+                await push(db.projets);
+            }
+        }
+
+        // --- CRUD REVENUS ---
+        async function addRevenue() {
+            const source = document.getElementById('revenue-source').value;
+            const amount = document.getElementById('revenue-amount').value;
+            const date = document.getElementById('revenue-date').value;
+            const proofFile = document.getElementById('revenue-proof').files[0];
+
+            if(!source || !amount || !date) return alert("Remplissez tous les champs revenu");
+            
+            showLoader(true);
+            const revenueId = Date.now();
+            let proofUrl = proofFile ? await uploadToGithub(proofFile, `project-revenue/${revenueId}.png`) : "";
+
+            const revenue = { id: revenueId, source, amount, date, img: proofUrl };
+            
+            if(!currentProject.revenus) currentProject.revenus = [];
+            currentProject.revenus.push(revenue);
+            
+            const projectIndex = db.projets.findIndex(p => p.id == currentProject.id);
+            db.projets[projectIndex] = currentProject;
+            
+            await push(db.projets);
+            
+            // Vider le formulaire
+            document.getElementById('revenue-source').value = "";
+            document.getElementById('revenue-amount').value = "";
+            document.getElementById('revenue-date').value = "";
+            document.getElementById('revenue-proof').value = "";
+        }
+
+        async function deleteRevenue(id) {
+            if(confirm("Supprimer ce revenu ?")) {
+                currentProject.revenus = currentProject.revenus.filter(r => r.id != id);
+                const projectIndex = db.projets.findIndex(p => p.id == currentProject.id);
+                db.projets[projectIndex] = currentProject;
+                await push(db.projets);
+            }
+        }
+
+        // --- RENDU UI ---
+        function renderAll() {
+            if (!currentProject) return;
+
+            // Mettre à jour le nom du projet
+            document.getElementById('project-name').innerHTML = `<span class="w-2 h-2 bg-purple-600 rounded-full animate-ping"></span> ${currentProject.nom}`;
+
+            // Calculer les statistiques
+            const totalFonds = (currentProject.fonds || []).reduce((acc, f) => acc + parseFloat(f.amount || 0), 0);
+            const totalDepenses = (currentProject.depenses || []).reduce((acc, d) => acc + parseFloat(d.amount || 0), 0);
+            const totalRevenus = (currentProject.revenus || []).reduce((acc, r) => acc + parseFloat(r.amount || 0), 0);
+            const soldeFinal = totalFonds + totalRevenus - totalDepenses;
+
+            // Mettre à jour les statistiques
+            document.getElementById('stat-funds').innerText = totalFonds.toLocaleString() + " Ar";
+            document.getElementById('stat-expenses').innerText = totalDepenses.toLocaleString() + " Ar";
+            document.getElementById('stat-revenue').innerText = totalRevenus.toLocaleString() + " Ar";
+            document.getElementById('stat-balance').innerText = soldeFinal.toLocaleString() + " Ar";
+
+            // Afficher les fonds
+            document.getElementById('funds-list').innerHTML = (currentProject.fonds || []).slice().reverse().map(f => `
+                <div class="flex items-center justify-between p-3 bg-indigo-50 rounded-xl border border-indigo-100">
+                    <div class="flex-1">
+                        <p class="text-xs font-black text-indigo-700">${f.source}</p>
+                        <p class="text-[10px] text-slate-600">${f.date} • <span class="font-bold text-indigo-600">+${parseFloat(f.amount).toLocaleString()} Ar</span></p>
+                    </div>
+                    <div class="flex gap-2">
+                        ${f.img ? `<a href="${f.img}" target="_blank" class="w-6 h-6 flex items-center justify-center bg-indigo-500 rounded text-white"><i class="fas fa-image text-[8px]"></i></a>` : ''}
+                        <button onclick="deleteFund(${f.id})" class="w-6 h-6 flex items-center justify-center bg-red-500/20 text-red-500 rounded hover:bg-red-500 hover:text-white transition"><i class="fas fa-times text-[8px]"></i></button>
+                    </div>
+                </div>
+            `).join('');
+
+            // Afficher les dépenses
+            document.getElementById('expenses-list').innerHTML = (currentProject.depenses || []).slice().reverse().map(d => `
+                <div class="flex items-center justify-between p-3 bg-red-50 rounded-xl border border-red-100">
+                    <div class="flex-1">
+                        <p class="text-xs font-black text-red-700">${d.description}</p>
+                        <p class="text-[10px] text-slate-600">${d.date} • <span class="font-bold text-red-600">-${parseFloat(d.amount).toLocaleString()} Ar</span></p>
+                    </div>
+                    <div class="flex gap-2">
+                        ${d.img ? `<a href="${d.img}" target="_blank" class="w-6 h-6 flex items-center justify-center bg-red-500 rounded text-white"><i class="fas fa-image text-[8px]"></i></a>` : ''}
+                        <button onclick="deleteExpense(${d.id})" class="w-6 h-6 flex items-center justify-center bg-red-500/20 text-red-500 rounded hover:bg-red-500 hover:text-white transition"><i class="fas fa-times text-[8px]"></i></button>
+                    </div>
+                </div>
+            `).join('');
+
+            // Afficher les revenus
+            document.getElementById('revenue-list').innerHTML = (currentProject.revenus || []).slice().reverse().map(r => `
+                <div class="flex items-center justify-between p-3 bg-emerald-50 rounded-xl border border-emerald-100">
+                    <div class="flex-1">
+                        <p class="text-xs font-black text-emerald-700">${r.source}</p>
+                        <p class="text-[10px] text-slate-600">${r.date} • <span class="font-bold text-emerald-600">+${parseFloat(r.amount).toLocaleString()} Ar</span></p>
+                    </div>
+                    <div class="flex gap-2">
+                        ${r.img ? `<a href="${r.img}" target="_blank" class="w-6 h-6 flex items-center justify-center bg-emerald-500 rounded text-white"><i class="fas fa-image text-[8px]"></i></a>` : ''}
+                        <button onclick="deleteRevenue(${r.id})" class="w-6 h-6 flex items-center justify-center bg-red-500/20 text-red-500 rounded hover:bg-red-500 hover:text-white transition"><i class="fas fa-times text-[8px]"></i></button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function viewProject() {
+            window.location.href = `project.html?id=${currentProject.id}`;
+        }
+
+        function showLoader(s) { document.getElementById('loader').classList[s?'remove':'add']('hidden'); }
+        const toB64 = f => new Promise(res => { const r = new FileReader(); r.onload = () => res(r.result); r.readAsDataURL(f); });
+    </script>
+</body>
+</html>
